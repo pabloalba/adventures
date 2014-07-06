@@ -28,6 +28,14 @@ function Character(belongsTo, name, imageSrc, life, armor, x, y, actions){
             this.image.src = imageSrc;
 }
 
+function Obstacle(imageSrc, x, y){
+            this.src = imageSrc;
+            this.image = new Image(),
+            this.x = x;
+            this.y = y;
+            this.image.src = imageSrc;
+}
+
 var characterGenerator = {
     generateThief: function(belongsTo, name, x, y) {
         var actions = [
@@ -145,6 +153,14 @@ var gui = {
         }
     },
 
+    drawObstacles: function() {
+        console.log('drawObstacles ' + game.obstacles.length);
+        for (i=0; i<game.obstacles.length; i++) {
+            var obstacle = game.obstacles[i];
+            this.ctx.drawImage(obstacle.image, obstacle.x * this.base, obstacle.y * this.base);
+        }
+    },
+
     drawProbabilities: function() {
         console.log('drawProbabilities ' + game.characters.length);
 
@@ -259,6 +275,7 @@ var gui = {
         this.drawBackground();
         this.drawRange();
         this.drawCharacters();
+        this.drawObstacles();
         this.drawProbabilities();
         this.drawCurrentCharacter();
     },
@@ -303,6 +320,15 @@ var game = {
 
         }
 
+        //obstacles
+
+        this.obstacles = []
+        this.addObstacle(new Obstacle("images/rock1.png", 7, 8));
+        this.addObstacle(new Obstacle("images/rock1.png", 2, 6));
+        this.addObstacle(new Obstacle("images/rock1.png", 5, 4));
+        this.addObstacle(new Obstacle("images/rock1.png", 1, 2));
+        this.addObstacle(new Obstacle("images/rock1.png", 8, 1));
+
 
         //characters
         this.characters = []
@@ -311,12 +337,6 @@ var game = {
         this.addCharacter(characterGenerator.generateCleric(0, "Karl", 8, 3));
         this.addCharacter(characterGenerator.generateMage(1, "Zoo", 1, 1));
         this.addCharacter(characterGenerator.generateRanger(0, "LongShot", 8, 5));
-
-        for (i=0; i<this.characters.length; i++) {
-            var character = this.characters[i];
-            console.log(character);
-            this.board[character.y][character.x] = character;
-        }
 
         gui.setup();
         this.selectFirstCharacter();
@@ -327,6 +347,12 @@ var game = {
     addCharacter: function(character) {
         this.characters.push(character);
         this.aliveCharacters[character.belongsTo]++;
+        this.board[character.y][character.x] = character;
+    },
+
+    addObstacle: function(obstacle) {
+        this.obstacles.push(obstacle);
+        this.board[obstacle.y][obstacle.x] = obstacle;
     },
 
     boardClick: function(e) {
