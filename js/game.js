@@ -234,12 +234,17 @@ var gui = {
             } else {
                 this.ctx.fillStyle="#FF0000";
             }
-            for (x=0; x<game.sizeX; x++) {
+            /*for (x=0; x<game.sizeX; x++) {
                 for (y=0; y<game.sizeY; y++) {
                     if (game.distance(game.currentCharacter.x, game.currentCharacter.y, x, y) <= game.currentAction.range) {
                         gui.ctx.fillRect(x * gui.base, y * gui.base, gui.base, gui.base);
                     }
                 }
+            }*/
+
+            for (i=0; i<game.reachablePositions.length;i++) {
+                var pos = game.reachablePositions[i];
+                gui.ctx.fillRect(pos.x * gui.base, pos.y * gui.base, gui.base, gui.base);
             }
         }
         this.ctx.globalAlpha=1;
@@ -355,7 +360,8 @@ var game = {
                 } else {
                     //Atack
                     if ((targetCharacter instanceof Character) &&
-                        (distance <= this.currentAction.range)){
+                        (targetCharacter.belongsTo != this.currentPlayer) &&
+                        (this.onReachables(position.x, position.y))){
                         this.atack(targetCharacter);
                         this.clearAction();
                     }
@@ -402,7 +408,7 @@ var game = {
 
     moveCharacter: function(character, x, y){
         console.log("Move from " + character.x+" "+character.y);
-        this.board[character.y][character.x] = 0;
+        this.board[character.y][character.x] = null;
         character.x = x;
         character.y = y;
         this.board[character.y][character.x] = character;
@@ -416,6 +422,12 @@ var game = {
             (action.coolDown == 0) &&
             (this.currentCharacter.numActions !=0)) {
             this.currentAction = action;
+            if (action.type=="MOVE") {
+                this.reachablePositions = this.reachables(this.currentCharacter.x, this.currentCharacter.y, action.range);
+            } else {
+                this.reachablePositions = this.onDistance(this.currentCharacter.x, this.currentCharacter.y, action.range);
+            }
+
         } else {
             this.clearAction();
         }
@@ -472,6 +484,80 @@ var game = {
 
     probability: function(character) {
         return this.currentAction.success - character.armor;
+    },
+
+    onDistance: function(charX, charY, range) {
+        var positions = [];
+        for (y=0; y<this.sizeY; y++) {
+            for (x=0; x<this.sizeX; x++) {
+                var distance = this.distance(charX, charY, x, y);
+                if (distance <=range){
+                    positions.push({x:x, y:y, range:distance});
+                }
+            }
+        }
+        return positions;
+    },
+
+    reachables: function(x, y, range) {
+        var positions = [];
+        this.addToPositions(positions, x, y, range);
+        var current = 0;
+        while (current < positions.length) {
+            var pos = positions[current];
+            if (pos.range > 0) {
+                if (pos.y > 0) {
+                    if (this.board[pos.y -1][pos.x] == null) {
+                        this.addToPositions(positions, pos.x, pos.y-1, pos.range-1);
+                    }
+                }
+                if (pos.y < this.sizeY -1) {
+                    if (this.board[pos.y +1][pos.x] == null) {
+                        this.addToPositions(positions, pos.x, pos.y+1, pos.range-1);
+                    }
+                }
+                if (pos.x > 0) {
+                    if (this.board[pos.y][pos.x-1] == null) {
+                        this.addToPositions(positions, pos.x-1, pos.y, pos.range-1);
+                    }
+                }
+                if (pos.x < this.sizeX-1) {
+                    if (this.board[pos.y][pos.x+1] == null) {
+                        this.addToPositions(positions, pos.x+1, pos.y, pos.range-1);
+                    }
+                }
+            }
+            current++;
+        }
+        return positions;
+
+    },
+
+    addToPositions: function(positions, x, y, range) {
+        var find = false;
+        for (i=0; i<positions.length; i++) {
+            if ((positions[i].x == x) && (positions[i].y == y)) {
+                find = true;
+                if (positions[i].range < range) {
+                    positions.push({x:x, y:y, range:range});
+                }
+            }
+        }
+
+        if (find == false) {
+            positions.push({x:x, y:y, range:range});
+        }
+
+    },
+
+    onReachables: function(x, y) {
+        for (i=0; i<this.reachablePositions.length;i++){
+            if ((this.reachablePositions[i].x == x) &&
+                (this.reachablePositions[i].y == y)){
+                    return true;
+                }
+        }
+        return false;
     }
 
 };
