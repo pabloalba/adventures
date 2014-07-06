@@ -28,11 +28,13 @@ function Character(belongsTo, name, imageSrc, life, armor, x, y, actions){
             this.image.src = imageSrc;
 }
 
-function Obstacle(imageSrc, x, y){
+function Obstacle(imageSrc, x, y, offsetX, offsetY){
             this.src = imageSrc;
             this.image = new Image(),
             this.x = x;
             this.y = y;
+            this.offsetX = offsetX;
+            this.offsetY = offsetY;
             this.image.src = imageSrc;
 }
 
@@ -42,7 +44,7 @@ var characterGenerator = {
             new Action("MOVE", "Walk", "images/walk.png", 5, null, 100, 0),
             new Action("ATACK", "Dagger", "images/dagger.png", 1, 4, 80, 0),
             new Action("ATACK", "Throw dagger", "images/dagger_throw.png", 3, 2, 70, 0),
-            new Action("ATACK", "Throw poisoned dagger", "images/dagger_throw_poison.png", 3, 1, 70, 2)
+            new Action("ATACK", "Throw poisoned dagger", "images/dagger_throw_poison.png", 3, 10, 70, 2)
         ];
         return new Character(belongsTo, name, "images/thief.png", 10, 20, x, y, actions);
 
@@ -54,6 +56,14 @@ var characterGenerator = {
             new Action("ATACK", "Morningstar", "images/mace-and-chain.png", 2, 6, 80, 0)
         ];
         return new Character(belongsTo, name, "images/warrior.png", 20, 50, x, y, actions);
+    },
+    generateDwarf: function(belongsTo, name, x, y) {
+        var actions = [
+            new Action("MOVE", "Walk", "images/walk.png", 3, null, 100, 0),
+            new Action("ATACK", "Battle Axe", "images/battleaxe.png", 1, 10, 95, 0),
+            new Action("ATACK", "Throw rock", "images/rock_thrown.png", 3, 4, 85, 0)
+        ];
+        return new Character(belongsTo, name, "images/dwarf.png", 25, 60, x, y, actions);
     },
     generateCleric: function(belongsTo, name, x, y) {
         var actions = [
@@ -157,7 +167,7 @@ var gui = {
         console.log('drawObstacles ' + game.obstacles.length);
         for (i=0; i<game.obstacles.length; i++) {
             var obstacle = game.obstacles[i];
-            this.ctx.drawImage(obstacle.image, obstacle.x * this.base, obstacle.y * this.base);
+            this.ctx.drawImage(obstacle.image, obstacle.x * this.base + obstacle.offsetX, obstacle.y * this.base + obstacle.offsetY);
         }
     },
 
@@ -233,6 +243,7 @@ var gui = {
                         probability = 0;
                     }
                     $("#actionDetails").append("<div>Success base: "+probability+"%</div>");
+                    $("#actionDetails").append("<div>Damage: 1-"+game.currentAction.damage+"</div>");
                 }
             }
 
@@ -248,15 +259,8 @@ var gui = {
             if (game.currentCharacter.belongsTo == 0) {
                 this.ctx.fillStyle="#0000FF";
             } else {
-                this.ctx.fillStyle="#FF0000";
+                this.ctx.fillStyle="#FF7700";
             }
-            /*for (x=0; x<game.sizeX; x++) {
-                for (y=0; y<game.sizeY; y++) {
-                    if (game.distance(game.currentCharacter.x, game.currentCharacter.y, x, y) <= game.currentAction.range) {
-                        gui.ctx.fillRect(x * gui.base, y * gui.base, gui.base, gui.base);
-                    }
-                }
-            }*/
 
             for (i=0; i<game.reachablePositions.length;i++) {
                 var pos = game.reachablePositions[i];
@@ -323,11 +327,13 @@ var game = {
         //obstacles
 
         this.obstacles = []
-        this.addObstacle(new Obstacle("images/rock1.png", 7, 8));
-        this.addObstacle(new Obstacle("images/rock1.png", 2, 6));
-        this.addObstacle(new Obstacle("images/rock1.png", 5, 4));
-        this.addObstacle(new Obstacle("images/rock1.png", 1, 2));
-        this.addObstacle(new Obstacle("images/rock1.png", 8, 1));
+        this.addObstacle(new Obstacle("images/rock1.png", 7, 8, 0, 0));
+        this.addObstacle(new Obstacle("images/rock1.png", 2, 6, 0, 0));
+        this.addObstacle(new Obstacle("images/rock1.png", 1, 2, 0, 0));
+        this.addObstacle(new Obstacle("images/rock1.png", 8, 1, 0, 0));
+        this.addObstacle(new Obstacle("images/tree.png", 5, 4, 0, -50));
+        this.addObstacle(new Obstacle("images/tree.png", 10, 7, 0, -50));
+        this.addObstacle(new Obstacle("images/tree.png", 4, 9, 0, -50));
 
 
         //characters
@@ -337,6 +343,7 @@ var game = {
         this.addCharacter(characterGenerator.generateCleric(0, "Karl", 8, 3));
         this.addCharacter(characterGenerator.generateMage(1, "Zoo", 1, 1));
         this.addCharacter(characterGenerator.generateRanger(0, "LongShot", 8, 5));
+        this.addCharacter(characterGenerator.generateDwarf(1, "LongShot", 10, 2));
 
         gui.setup();
         this.selectFirstCharacter();
