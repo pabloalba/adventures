@@ -11,7 +11,7 @@ function Action(type, name, imageSrc, range, damage, success, coolDown){
 
 
 
-function Character(belongsTo, name, imageSrc, life, x, y, actions){
+function Character(belongsTo, name, imageSrc, life, armor, x, y, actions){
             this.belongsTo = belongsTo;
             this.name = name;
             this.src = imageSrc;
@@ -21,6 +21,7 @@ function Character(belongsTo, name, imageSrc, life, x, y, actions){
             this.x = x;
             this.y = y;
             this.numActions = 2;
+            this.armor = armor;
 
             this.actions = actions;
 
@@ -35,16 +36,42 @@ var characterGenerator = {
             new Action("ATACK", "Throw dagger", "images/dagger_throw.png", 3, 2, 70, 0),
             new Action("ATACK", "Throw poisoned dagger", "images/dagger_throw_poison.png", 3, 1, 70, 2)
         ];
-        return new Character(belongsTo, name, "images/thief.png", 4, x, y, actions);
+        return new Character(belongsTo, name, "images/thief.png", 10, 20, x, y, actions);
 
     },
     generateWarrior: function(belongsTo, name, x, y) {
         var actions = [
             new Action("MOVE", "Walk", "images/walk.png", 4, null, 100, 0),
             new Action("ATACK", "Sword", "images/sword.png", 1, 8, 95, 0),
-            new Action("ATACK", "Bow", "images/bow.png", 5, 6, 80, 0)
+            new Action("ATACK", "Morningstar", "images/mace-and-chain.png", 2, 6, 80, 0)
         ];
-        return new Character(belongsTo, name, "images/warrior.png", 10, x, y, actions);
+        return new Character(belongsTo, name, "images/warrior.png", 20, 50, x, y, actions);
+    },
+    generateCleric: function(belongsTo, name, x, y) {
+        var actions = [
+            new Action("MOVE", "Walk", "images/walk.png", 5, null, 100, 0),
+            new Action("ATACK", "Quarterstaf", "images/quarterstaff.png", 1, 8, 95, 0),
+            new Action("ATACK", "Sling", "images/sling.png", 4, 3, 80, 0),
+            new Action("ATACK", "Fire rain", "images/fire-rain.png", 10, 1000, 1000, 4),
+        ];
+        return new Character(belongsTo, name, "images/cleric.png", 15, 0, x, y, actions);
+    },
+    generateMage: function(belongsTo, name, x, y) {
+        var actions = [
+            new Action("MOVE", "Walk", "images/walk.png", 5, null, 100, 0),
+            new Action("MOVE", "Teleport", "images/teleport.png", 1000, null, 100, 2),
+            new Action("ATACK", "Dagger", "images/dagger.png", 1, 4, 80, 0),
+            new Action("ATACK", "Lighting bolt", "images/lightning.png", 10, 6, 1000, 4),
+        ];
+        return new Character(belongsTo, name, "images/mage.png", 10, 0, x, y, actions);
+    },
+    generateRanger: function(belongsTo, name, x, y) {
+        var actions = [
+            new Action("MOVE", "Walk", "images/walk.png", 6, null, 100, 0),
+            new Action("ATACK", "Short sword", "images/sword-short.png", 1, 6, 90, 0),
+            new Action("ATACK", "Bow", "images/bow.png", 8, 8, 80, 0),
+        ];
+        return new Character(belongsTo, name, "images/ranger.png", 15, 0, x, y, actions);
     }
 }
 
@@ -59,12 +86,19 @@ var gui = {
         canvas.attr("height", height);
 
         this.ctx = canvas[0].getContext("2d");
-        this.ctx.font="18px Georgia";
+        this.ctx.font="14px Georgia";
 
         //background
         this.imgBackground = new Image();
         this.imgBackground.src = "images/grass.png";
         this.imgBackground.onload = this.refresh();
+
+        this.playerAura = [];
+
+        this.playerAura[0] = new Image();
+        this.playerAura[0].src = "images/player1-aura.png";
+        this.playerAura[1] = new Image();
+        this.playerAura[1].src = "images/player2-aura.png";
 
     },
 
@@ -105,8 +139,35 @@ var gui = {
         for (i=0; i<game.characters.length; i++) {
             var character = game.characters[i];
             this.ctx.drawImage(character.image, character.x * this.base, character.y * this.base);
-            this.ctx.fillStyle="#FF0000";
-            //this.ctx.fillText("75%", character.x * this.base + 20, character.y * this.base + 70);
+            if (this.playerAura) {
+                this.ctx.drawImage(this.playerAura[character.belongsTo], character.x * this.base -36, character.y * this.base - 36);
+            }
+        }
+    },
+
+    drawProbabilities: function() {
+        console.log('drawProbabilities ' + game.characters.length);
+
+        if ((game.currentAction) &&
+            (game.currentAction.type=="ATACK")){
+
+            for (i=0; i<game.characters.length; i++) {
+                var character = game.characters[i];
+
+                if ((character.belongsTo != game.currentCharacter.belongsTo) &&
+                    (game.distance(game.currentCharacter.x, game.currentCharacter.y, character.x, character.y) <= game.currentAction.range)) {
+                    var probability = game.probability(character);
+                    if (probability > 100) {
+                        probability = 100;
+                    }
+                    if (probability < 0) {
+                        probability = 0;
+                    }
+
+                    this.ctx.fillStyle="#FF0000";
+                    this.ctx.fillText(probability + "%", character.x * this.base + 45, character.y * this.base + 15);
+                }
+            }
         }
     },
 
@@ -140,9 +201,25 @@ var gui = {
             }
 
 
-            $("#life").html(game.currentCharacter.life + " / " + game.currentCharacter.maxLife);
-            $("#numActions").html(game.currentCharacter.numActions);
+            $("#life").html("Life points: " + game.currentCharacter.life + " / " + game.currentCharacter.maxLife);
+            $("#numActions").html("Num actions: " + game.currentCharacter.numActions);
             $("#characterName").html(game.currentCharacter.name);
+
+            $("#actionDetails").html("");
+            if (game.currentAction) {
+                $("#actionDetails").append("<div>" + game.currentAction.name + " (" + game.currentAction.type.toLowerCase() + ") </div>");
+                if (game.currentAction.type == "ATACK") {
+                    var probability = game.currentAction.success;
+                    if (probability > 100) {
+                        probability = 100;
+                    }
+                    if (probability < 0) {
+                        probability = 0;
+                    }
+                    $("#actionDetails").append("<div>Success base: "+probability+"%</div>");
+                }
+            }
+
         }
     },
 
@@ -177,6 +254,7 @@ var gui = {
         this.drawBackground();
         this.drawRange();
         this.drawCharacters();
+        this.drawProbabilities();
         this.drawCurrentCharacter();
     },
 
@@ -191,6 +269,11 @@ var gui = {
         return  {x:x , y:y}
     },
 
+    startTurn: function (player) {
+        gui.log("=== START PLAYER " + this.currentPlayer + " TURN ===");
+        $("#turn").html("Player " + player + " turn");
+    },
+
     log:function(txt){
         $("#log").append("<div>"+txt+"</div>");
     }
@@ -201,7 +284,7 @@ var game = {
     sizeX: 20,
     sizeY: 10,
     currentPlayer:0,
-    aliveCharacters: [1,1],
+    aliveCharacters: [0,0],
     setup: function() {
         this.currentAction = null;
 
@@ -218,8 +301,11 @@ var game = {
 
         //characters
         this.characters = []
-        this.characters.push(characterGenerator.generateThief(0, "Arik", 5, 1));
-        this.characters.push(characterGenerator.generateWarrior(1, "Thair", 5, 2));
+        this.addCharacter(characterGenerator.generateThief(0, "Arik", 5, 1));
+        this.addCharacter(characterGenerator.generateWarrior(1, "Thair", 5, 2));
+        this.addCharacter(characterGenerator.generateCleric(0, "Karl", 8, 3));
+        this.addCharacter(characterGenerator.generateMage(1, "Zoo", 1, 1));
+        this.addCharacter(characterGenerator.generateRanger(0, "LongShot", 8, 5));
 
         for (i=0; i<this.characters.length; i++) {
             var character = this.characters[i];
@@ -229,71 +315,83 @@ var game = {
 
         gui.setup();
         this.selectFirstCharacter();
-        gui.log("=== START PLAYER " + this.currentPlayer + " TURN ===");
+        gui.log("====== START PLAYER " + this.currentPlayer + " TURN ======");
 
+    },
+
+    addCharacter: function(character) {
+        this.characters.push(character);
+        this.aliveCharacters[character.belongsTo]++;
     },
 
     boardClick: function(e) {
         var position = gui.clickPosition(e);
-        console.log("current action " + this.currentAction);
         var targetCharacter = this.board[position.y][position.x];
+        if (targetCharacter instanceof Character) {
+            this.selectCharacter(targetCharacter);
+            gui.refresh();
+        }
+    },
 
+    boardRightClick: function(e) {
         if ((this.currentAction != null) &&
             (this.currentCharacter.belongsTo == this.currentPlayer)) {
+                var position = gui.clickPosition(e);
+                var targetCharacter = this.board[position.y][position.x];
+
                 var distance = this.distance(this.currentCharacter.x, this.currentCharacter.y, position.x, position.y);
 
                 if (this.currentAction.type == "MOVE") {
-                    //Walk
-                    if (targetCharacter instanceof Character) {
-                        this.selectCharacter(targetCharacter);
-                    }
-
+                    //Move
                     if ((this.board[position.y][position.x] == null) &&
                         (distance <= this.currentAction.range)) {
                         this.moveCharacter(this.currentCharacter, position.x, position.y);
+                        this.currentAction.coolDown = this.currentAction.maxCoolDown;
                         this.clearAction();
                         this.currentCharacter.numActions -= 1;
                         gui.log("Move " + this.currentCharacter.name + " to " + position.x + ", " + position.y);
+
                     }
                 } else {
                     //Atack
-
                     if ((targetCharacter instanceof Character) &&
                         (distance <= this.currentAction.range)){
-                        var target = targetCharacter;
-                        var damage = Math.floor((Math.random() * this.currentAction.damage) + 1);
-
-                        gui.log(this.currentAction.name + " from " + this.currentCharacter.name + " to " + targetCharacter.name + " deals " + damage + " damage");
-
-
-                        target.life -=  damage;
-
-                        if (target.life <= 0) {
-                            gui.log(targetCharacter.name + " is dead");
-                            this.board[position.y][position.x] = null;
-                            var index = this.characters.indexOf(targetCharacter);
-                            this.characters.splice(index, 1);
-                            this.aliveCharacters[targetCharacter.belongsTo]--;
-                            if (this.aliveCharacters[targetCharacter.belongsTo] == 0) {
-                                alert("Game over - Winner player " + this.currentPlayer);
-                            }
-
-                        }
-                        this.currentAction.coolDown = this.currentAction.maxCoolDown;
-
-
+                        this.atack(targetCharacter);
                         this.clearAction();
-                        this.currentCharacter.numActions = 0;
                     }
                 }
-
-        } else {
-            if (targetCharacter instanceof Character) {
-                this.selectCharacter(targetCharacter);
-            }
+                gui.refresh();
         }
-        gui.refresh();
+    },
 
+    atack: function(character){
+        var probability = this.probability(character);
+        if ((Math.random() * 100) < probability) {
+
+
+            var damage = Math.floor((Math.random() * this.currentAction.damage) + 1);
+
+            gui.log(this.currentAction.name + " from " + this.currentCharacter.name + " to " + character.name + " deals " + damage + " damage");
+
+
+            character.life -=  damage;
+
+            if (character.life <= 0) {
+                gui.log(character.name + " is dead");
+                this.board[character.y][character.x] = null;
+                var index = this.characters.indexOf(character);
+                this.characters.splice(index, 1);
+                this.aliveCharacters[character.belongsTo]--;
+                if (this.aliveCharacters[character.belongsTo] == 0) {
+                    alert("Game over - Winner player " + this.currentPlayer);
+                }
+
+            }
+        } else {
+            gui.log(this.currentAction.name + " from " + this.currentCharacter.name + " to " + character.name + " miss");
+        }
+        this.currentAction.coolDown = this.currentAction.maxCoolDown;
+        this.currentCharacter.numActions = 0;
     },
 
     selectCharacter: function(character){
@@ -341,7 +439,7 @@ var game = {
         this.clearAction();
         alert("Next player");
         this.selectFirstCharacter();
-        gui.log("=== START PLAYER " + this.currentPlayer + " TURN ===");
+        gui.startTurn(this.currentPlayer);
     },
 
     selectFirstCharacter: function(){
@@ -370,6 +468,10 @@ var game = {
 
     distance: function(x1, y1, x2, y2) {
         return Math.abs(x1 -x2) + Math.abs(y1 - y2);
+    },
+
+    probability: function(character) {
+        return this.currentAction.success - character.armor;
     }
 
 };
@@ -381,11 +483,22 @@ var game = {
 
 $(document).ready(function() {
     console.log( "ready!" );
+    document.oncontextmenu = function() {return false;};
     game.setup();
 
     $("#board").click(function(e) {
         game.boardClick(e);
     });
+
+    $("#board").mousedown(function(e) {
+        if( e.button == 2 ) {
+            game.boardRightClick(e);
+            return false;
+        }
+        return true;
+    });
+
+
 
     $( "#actions" ).on( "click", ".action", function() {
         game.selectAction($(this));

@@ -2,6 +2,7 @@
   <head>
     <title>Adventures</title>
     <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <link href='http://fonts.googleapis.com/css?family=MedievalSharp' rel='stylesheet' type='text/css'>
     <script src="js/jquery.min.js"></script>
     <script src="js/game.js"></script>
   </head>
@@ -13,22 +14,34 @@
                   <img id="zoomOut" src="images/zoom_out.png"/>
               </div>
               <div>
-                  <img id="actionEndTurn" src="images/endturn.png"/>
+                  <div class="inline">
+                    <img id="actionEndTurn" src="images/endturn.png" title="End turn"/>
+                  </div>
+                  <div class="inline" id="turn">
+                    Player 0 turn
+                  </div>
               </div>
               <div>
                   <div>
-                    <img id="characterImg" />
+                      <div class="inline">
+                        <img id="characterImg" />
+                     </div>
+                     <div class="inline">
+                         <div>
+                            <label id="characterName"></label>
+                          </div>
+                          <div>
+                            <label id="life"></label>
+                          </div>
+                          <div>
+                            <label id="numActions"></label>
+                          </div>
+                     </div>
                   </div>
-                  <div>
-                    <label id="characterName"></label>
-                  </div>
-                  <div>
-                    <label id="life"></label>
-                  </div>
-                  <div>
-                    <label id="numActions"></label>
-                  </div>
+
                   <div id="actions">
+                  </div>
+                  <div id="actionDetails">
                   </div>
               </div>
               <div id="log">
