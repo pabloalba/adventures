@@ -361,7 +361,7 @@ var game = {
                     //Atack
                     if ((targetCharacter instanceof Character) &&
                         (targetCharacter.belongsTo != this.currentPlayer) &&
-                        (this.onReachables(position.x, position.y))){
+                        (this.onReachables(position.x, position.y)!=null)){
                         this.atack(targetCharacter);
                         this.clearAction();
                     }
@@ -406,12 +406,33 @@ var game = {
         this.selectFirstAction();
     },
 
+    drawPath: function() {
+        if (game.path.length > 0) {
+            var pos = game.path.shift();
+            game.currentCharacter.x = pos.x;
+            game.currentCharacter.y = pos.y;
+            console.log(game.currentCharacter.x + ", " +game.currentCharacter.y);
+            gui.refresh();
+            setTimeout(game.drawPath, 300);
+        }
+
+    },
+
     moveCharacter: function(character, x, y){
         console.log("Move from " + character.x+" "+character.y);
         this.board[character.y][character.x] = null;
-        character.x = x;
-        character.y = y;
-        this.board[character.y][character.x] = character;
+
+        var path = [];
+        var pos = this.onReachables(x, y);
+        while (pos.fromX != null) {
+            path.unshift(pos);
+            pos = this.onReachables(pos.fromX, pos.fromY);
+        }
+        this.path = path;
+
+        this.drawPath();
+
+        this.board[y][x] = character;
         console.log("Move to " + character.x+" "+character.y);
     },
 
@@ -501,29 +522,29 @@ var game = {
 
     reachables: function(x, y, range) {
         var positions = [];
-        this.addToPositions(positions, x, y, range);
+        this.addToPositions(positions, x, y, range, null, null);
         var current = 0;
         while (current < positions.length) {
             var pos = positions[current];
             if (pos.range > 0) {
                 if (pos.y > 0) {
                     if (this.board[pos.y -1][pos.x] == null) {
-                        this.addToPositions(positions, pos.x, pos.y-1, pos.range-1);
+                        this.addToPositions(positions, pos.x, pos.y-1, pos.range-1, pos.x, pos.y);
                     }
                 }
                 if (pos.y < this.sizeY -1) {
                     if (this.board[pos.y +1][pos.x] == null) {
-                        this.addToPositions(positions, pos.x, pos.y+1, pos.range-1);
+                        this.addToPositions(positions, pos.x, pos.y+1, pos.range-1, pos.x, pos.y);
                     }
                 }
                 if (pos.x > 0) {
                     if (this.board[pos.y][pos.x-1] == null) {
-                        this.addToPositions(positions, pos.x-1, pos.y, pos.range-1);
+                        this.addToPositions(positions, pos.x-1, pos.y, pos.range-1, pos.x, pos.y);
                     }
                 }
                 if (pos.x < this.sizeX-1) {
                     if (this.board[pos.y][pos.x+1] == null) {
-                        this.addToPositions(positions, pos.x+1, pos.y, pos.range-1);
+                        this.addToPositions(positions, pos.x+1, pos.y, pos.range-1, pos.x, pos.y);
                     }
                 }
             }
@@ -533,19 +554,22 @@ var game = {
 
     },
 
-    addToPositions: function(positions, x, y, range) {
+    addToPositions: function(positions, x, y, range, fromX, fromY) {
         var find = false;
         for (i=0; i<positions.length; i++) {
             if ((positions[i].x == x) && (positions[i].y == y)) {
                 find = true;
                 if (positions[i].range < range) {
-                    positions.push({x:x, y:y, range:range});
+                    //positions.push({x:x, y:y, range:range});
+                    positions[i].range = range;
+                    positions[i].fromX = fromX;
+                    positions[i].fromY = fromY;
                 }
             }
         }
 
         if (find == false) {
-            positions.push({x:x, y:y, range:range});
+            positions.push({x:x, y:y, range:range, fromX:fromX, fromY:fromY});
         }
 
     },
@@ -554,10 +578,10 @@ var game = {
         for (i=0; i<this.reachablePositions.length;i++){
             if ((this.reachablePositions[i].x == x) &&
                 (this.reachablePositions[i].y == y)){
-                    return true;
+                    return this.reachablePositions[i];
                 }
         }
-        return false;
+        return null;
     }
 
 };
