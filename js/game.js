@@ -11,7 +11,7 @@ function Action(type, name, imageSrc, range, damage, success, coolDown){
 
 
 
-function Character(belongsTo, name, imageSrc, life, armor, x, y, actions){
+function Character(belongsTo, name, imageSrc, srcAtack, life, armor, x, y, actions){
             this.belongsTo = belongsTo;
             this.name = name;
             this.src = imageSrc;
@@ -22,6 +22,7 @@ function Character(belongsTo, name, imageSrc, life, armor, x, y, actions){
             this.y = y;
             this.numActions = 2;
             this.armor = armor;
+            this.srcAtack = srcAtack;
 
             this.actions = actions;
 
@@ -46,7 +47,7 @@ var characterGenerator = {
             new Action("ATACK", "Throw dagger", "images/dagger_throw.png", 3, 2, 70, 0),
             new Action("ATACK", "Throw poisoned dagger", "images/dagger_throw_poison.png", 3, 10, 70, 2)
         ];
-        return new Character(belongsTo, name, "images/thief.png", 10, 20, x, y, actions);
+        return new Character(belongsTo, name, "images/thief.png", "images/thief.gif", 10, 20, x, y, actions);
 
     },
     generateWarrior: function(belongsTo, name, x, y) {
@@ -55,7 +56,7 @@ var characterGenerator = {
             new Action("ATACK", "Sword", "images/sword.png", 1, 8, 95, 0),
             new Action("ATACK", "Morningstar", "images/mace-and-chain.png", 2, 6, 80, 0)
         ];
-        return new Character(belongsTo, name, "images/warrior.png", 20, 50, x, y, actions);
+        return new Character(belongsTo, name, "images/warrior.png", "images/warrior.gif", 20, 50, x, y, actions);
     },
     generateDwarf: function(belongsTo, name, x, y) {
         var actions = [
@@ -63,16 +64,16 @@ var characterGenerator = {
             new Action("ATACK", "Battle Axe", "images/battleaxe.png", 1, 10, 95, 0),
             new Action("ATACK", "Throw rock", "images/rock_thrown.png", 3, 4, 85, 0)
         ];
-        return new Character(belongsTo, name, "images/dwarf.png", 25, 60, x, y, actions);
+        return new Character(belongsTo, name, "images/dwarf.png","images/dwarf.gif",  25, 60, x, y, actions);
     },
     generateCleric: function(belongsTo, name, x, y) {
         var actions = [
             new Action("MOVE", "Walk", "images/walk.png", 5, null, 100, 0),
             new Action("ATACK", "Quarterstaf", "images/quarterstaff.png", 1, 8, 95, 0),
             new Action("ATACK", "Sling", "images/sling.png", 4, 3, 80, 0),
-            new Action("ATACK", "Fire rain", "images/fire-rain.png", 10, 1000, 1000, 4),
+            new Action("ATACK", "Fire rain", "images/fire-rain.png", 1000, 10, 1000, 4),
         ];
-        return new Character(belongsTo, name, "images/cleric.png", 15, 0, x, y, actions);
+        return new Character(belongsTo, name, "images/cleric.png","images/cleric.gif",  15, 0, x, y, actions);
     },
     generateMage: function(belongsTo, name, x, y) {
         var actions = [
@@ -81,7 +82,7 @@ var characterGenerator = {
             new Action("ATACK", "Dagger", "images/dagger.png", 1, 4, 80, 0),
             new Action("ATACK", "Lighting bolt", "images/lightning.png", 10, 6, 1000, 4),
         ];
-        return new Character(belongsTo, name, "images/mage.png", 10, 0, x, y, actions);
+        return new Character(belongsTo, name, "images/mage.png","images/mage.gif",  10, 0, x, y, actions);
     },
     generateRanger: function(belongsTo, name, x, y) {
         var actions = [
@@ -89,7 +90,7 @@ var characterGenerator = {
             new Action("ATACK", "Short sword", "images/sword-short.png", 1, 6, 90, 0),
             new Action("ATACK", "Bow", "images/bow.png", 8, 8, 80, 0),
         ];
-        return new Character(belongsTo, name, "images/ranger.png", 15, 0, x, y, actions);
+        return new Character(belongsTo, name, "images/ranger.png","images/ranger.gif",  15, 30, x, y, actions);
     }
 }
 
@@ -146,6 +147,7 @@ var gui = {
         for (x=0; x<game.sizeX; x++) {
             for (y=0; y<game.sizeY; y++) {
                 gui.ctx.drawImage(gui.imgBackground, x * gui.base, y * gui.base);
+                this.ctx.strokeStyle="#000000";
                 gui.ctx.strokeRect(x * gui.base, y * gui.base, gui.base, gui.base);
             }
         }
@@ -159,6 +161,11 @@ var gui = {
             this.ctx.drawImage(character.image, character.x * this.base, character.y * this.base);
             if (this.playerAura) {
                 this.ctx.drawImage(this.playerAura[character.belongsTo], character.x * this.base -36, character.y * this.base - 36);
+            }
+
+            if (character == game.currentCharacter) {
+                this.ctx.strokeStyle="#FFFFFF";
+                gui.ctx.strokeRect(character.x * gui.base, character.y * gui.base, gui.base, gui.base);
             }
         }
     },
@@ -226,9 +233,16 @@ var gui = {
 
             }
 
+            $("#characterDetails").html("");
 
-            $("#life").html("Life points: " + game.currentCharacter.life + " / " + game.currentCharacter.maxLife);
-            $("#numActions").html("Num actions: " + game.currentCharacter.numActions);
+            $("#characterDetails").append("<div>"+game.currentCharacter.name+"</div>");
+            $("#characterDetails").append("<div>Armor: " + game.currentCharacter.armor+"</div>");
+            $("#characterDetails").append("<div>Life points: " + game.currentCharacter.life + " / " + game.currentCharacter.maxLife+"</div>");
+            $("#characterDetails").append("<div>Num actions: " + game.currentCharacter.numActions+ "</div>");
+
+
+            $("#life").html();
+            $("#numActions").html();
             $("#characterName").html(game.currentCharacter.name);
 
             $("#actionDetails").html("");
@@ -244,6 +258,9 @@ var gui = {
                     }
                     $("#actionDetails").append("<div>Success base: "+probability+"%</div>");
                     $("#actionDetails").append("<div>Damage: 1-"+game.currentAction.damage+"</div>");
+                    if (game.currentAction.maxCoolDown) {
+                        $("#actionDetails").append("<div>Cooldown: "+game.currentAction.coolDown+" / "+game.currentAction.maxCoolDown+"</div>");
+                    }
                 }
             }
 
@@ -304,9 +321,19 @@ var gui = {
         $("#log").append("<div>"+txt+"</div>");
     },
 
-    showAtackLightbox: function(title){
-        $('#atack-info').find(".title").html(title);
+    showAtackLightbox: function(atacker, defender, action, result){
+        $('#atack-info').find(".title").html(atacker.name + " atacks " +defender.name + " with " + action.name);
+        $('#atack-info').find(".atacker").attr('src', atacker.srcAtack);
+        $('#atack-info').find(".defender").attr('src', defender.src);
+        $('#atack-info').find(".weapon").attr('src', action.src);
+        $('#atack-info').find(".result").html(" and " + result);
         $('#atack-info').lightbox_me({
+            centered: true
+        });
+    },
+    info: function(txt) {
+        $('#info').find(".title").html(txt);
+        $('#info').lightbox_me({
             centered: true
         });
     }
@@ -314,12 +341,16 @@ var gui = {
 
 }
 var game = {
+    paused: true,
     sizeX: 20,
     sizeY: 10,
     currentPlayer:0,
     aliveCharacters: [0,0],
+
     setup: function() {
         this.currentAction = null;
+        this.characters = [];
+        this.obstacles = [];
 
         //Board
         this.board = [];
@@ -331,31 +362,17 @@ var game = {
 
         }
 
-        //obstacles
 
-        this.obstacles = []
-        this.addObstacle(new Obstacle("images/rock1.png", 7, 8, 0, 0));
-        this.addObstacle(new Obstacle("images/rock1.png", 2, 6, 0, 0));
-        this.addObstacle(new Obstacle("images/rock1.png", 1, 2, 0, 0));
-        this.addObstacle(new Obstacle("images/rock1.png", 8, 1, 0, 0));
-        this.addObstacle(new Obstacle("images/tree.png", 5, 4, 0, -50));
-        this.addObstacle(new Obstacle("images/tree.png", 10, 7, 0, -50));
-        this.addObstacle(new Obstacle("images/tree.png", 4, 9, 0, -50));
-
-
-        //characters
-        this.characters = []
-        this.addCharacter(characterGenerator.generateThief(0, "Arik", 5, 1));
-        this.addCharacter(characterGenerator.generateWarrior(1, "Thair", 5, 2));
-        this.addCharacter(characterGenerator.generateCleric(0, "Karl", 8, 3));
-        this.addCharacter(characterGenerator.generateMage(1, "Zoo", 1, 1));
-        this.addCharacter(characterGenerator.generateRanger(0, "LongShot", 8, 5));
-        this.addCharacter(characterGenerator.generateDwarf(1, "LongShot", 10, 2));
 
         gui.setup();
-        this.selectFirstCharacter();
-        gui.log("====== START PLAYER " + this.currentPlayer + " TURN ======");
 
+
+    },
+
+    start: function(){
+        gui.log("====== START PLAYER " + this.currentPlayer + " TURN ======");
+        this.selectFirstCharacter();
+        this.paused = false;
     },
 
     addCharacter: function(character) {
@@ -370,32 +387,44 @@ var game = {
     },
 
     boardClick: function(e) {
-        var position = gui.clickPosition(e);
-        var targetCharacter = this.board[position.y][position.x];
-        if (targetCharacter instanceof Character) {
-            this.selectCharacter(targetCharacter);
-            gui.refresh();
+        if (!this.paused) {
+            if ((this.currentAction != null) &&
+                (this.currentCharacter.belongsTo == this.currentPlayer)) {
+                    this.boardRightClick(e);
+            } else {
+                var position = gui.clickPosition(e);
+                var targetCharacter = this.board[position.y][position.x];
+                if (targetCharacter instanceof Character) {
+                    this.selectCharacter(targetCharacter);
+                    gui.refresh();
+                }
+            }
         }
     },
 
     boardRightClick: function(e) {
-        if ((this.currentAction != null) &&
-            (this.currentCharacter.belongsTo == this.currentPlayer)) {
+        if (!this.paused) {
+
                 var position = gui.clickPosition(e);
                 var targetCharacter = this.board[position.y][position.x];
 
                 var distance = this.distance(this.currentCharacter.x, this.currentCharacter.y, position.x, position.y);
 
                 if (this.currentAction.type == "MOVE") {
-                    //Move
-                    if ((this.board[position.y][position.x] == null) &&
-                        (distance <= this.currentAction.range)) {
-                        this.moveCharacter(this.currentCharacter, position.x, position.y);
-                        this.currentAction.coolDown = this.currentAction.maxCoolDown;
-                        this.clearAction();
-                        this.currentCharacter.numActions -= 1;
-                        gui.log("Move " + this.currentCharacter.name + " to " + position.x + ", " + position.y);
+                    if (targetCharacter instanceof Character) {
+                        this.selectCharacter(targetCharacter);
+                        gui.refresh();
+                    } else {
+                        //Move
+                        if ((this.board[position.y][position.x] == null) &&
+                            (distance <= this.currentAction.range)) {
+                            this.moveCharacter(this.currentCharacter, position.x, position.y);
+                            this.currentAction.coolDown = this.currentAction.maxCoolDown;
+                            this.clearAction();
+                            this.currentCharacter.numActions -= 1;
+                            gui.log("Move " + this.currentCharacter.name + " to " + position.x + ", " + position.y);
 
+                        }
                     }
                 } else {
                     //Atack
@@ -407,6 +436,7 @@ var game = {
                     }
                 }
                 gui.refresh();
+
         }
     },
 
@@ -419,7 +449,7 @@ var game = {
 
             gui.log(this.currentAction.name + " from " + this.currentCharacter.name + " to " + character.name + " deals " + damage + " damage");
 
-            gui.showAtackLightbox(this.currentAction.name + " from " + this.currentCharacter.name + " to " + character.name + " deals " + damage + " damage");
+            gui.showAtackLightbox(this.currentCharacter, character,  this.currentAction, "deals " + damage + " damage");
 
 
             character.life -=  damage;
@@ -431,13 +461,13 @@ var game = {
                 this.characters.splice(index, 1);
                 this.aliveCharacters[character.belongsTo]--;
                 if (this.aliveCharacters[character.belongsTo] == 0) {
-                    alert("Game over - Winner player " + this.currentPlayer);
+                    gui.info("Game over - Winner player " + this.currentPlayer);
                 }
 
             }
         } else {
             gui.log(this.currentAction.name + " from " + this.currentCharacter.name + " to " + character.name + " miss");
-            gui.showAtackLightbox(this.currentAction.name + " from " + this.currentCharacter.name + " to " + character.name + " miss");
+            gui.showAtackLightbox(this.currentCharacter, character,  this.currentAction, "miss");
         }
         this.currentAction.coolDown = this.currentAction.maxCoolDown;
         this.currentCharacter.numActions = 0;
@@ -481,41 +511,45 @@ var game = {
 
 
     selectAction: function(imageAction) {
-        var action = this.currentCharacter.actions[imageAction.data("number")];
-        if ((this.currentAction != action) &&
-            (action.coolDown == 0) &&
-            (this.currentCharacter.numActions !=0)) {
-            this.currentAction = action;
-            if (action.type=="MOVE") {
-                this.reachablePositions = this.reachables(this.currentCharacter.x, this.currentCharacter.y, action.range);
-            } else {
-                this.reachablePositions = this.onDistance(this.currentCharacter.x, this.currentCharacter.y, action.range);
-            }
+        if (!this.paused) {
+            var action = this.currentCharacter.actions[imageAction.data("number")];
+            if ((this.currentAction != action) &&
+                (action.coolDown == 0) &&
+                (this.currentCharacter.numActions !=0)) {
+                this.currentAction = action;
+                if (action.type=="MOVE") {
+                    this.reachablePositions = this.reachables(this.currentCharacter.x, this.currentCharacter.y, action.range);
+                } else {
+                    this.reachablePositions = this.onDistance(this.currentCharacter.x, this.currentCharacter.y, action.range);
+                }
 
-        } else {
-            this.clearAction();
+            } else {
+                this.clearAction();
+            }
+            gui.refresh();
         }
-        gui.refresh();
     },
 
     actionEndTurn: function() {
-        this.currentPlayer = (this.currentPlayer + 1) % 2;
-        for (i=0;i<this.characters.length;i++){
-            var character = this.characters[i];
-            character.numActions = 2;
-            if (character.belongsTo == this.currentPlayer) {
-                for (j=0;j<character.actions.length;j++){
-                    if (character.actions[j].coolDown > 0) {
-                        character.actions[j].coolDown--;
+        if (!this.paused) {
+            this.currentPlayer = (this.currentPlayer + 1) % 2;
+            for (i=0;i<this.characters.length;i++){
+                var character = this.characters[i];
+                character.numActions = 2;
+                if (character.belongsTo == this.currentPlayer) {
+                    for (j=0;j<character.actions.length;j++){
+                        if (character.actions[j].coolDown > 0) {
+                            character.actions[j].coolDown--;
+                        }
                     }
                 }
             }
-        }
 
-        this.clearAction();
-        alert("Next player");
-        this.selectFirstCharacter();
-        gui.startTurn(this.currentPlayer);
+            this.clearAction();
+            gui.info("Next player");
+            this.selectFirstCharacter();
+            gui.startTurn(this.currentPlayer);
+        }
     },
 
     selectFirstCharacter: function(){
@@ -631,27 +665,37 @@ var game = {
 
 
 
+function createGame() {
+    //obstacles
+
+        game.addObstacle(new Obstacle("images/rock1.png", 7, 8, 0, 0));
+        game.addObstacle(new Obstacle("images/rock1.png", 2, 6, 0, 0));
+        game.addObstacle(new Obstacle("images/rock1.png", 1, 2, 0, 0));
+        game.addObstacle(new Obstacle("images/rock1.png", 8, 1, 0, 0));
+        game.addObstacle(new Obstacle("images/tree.png", 5, 4, 0, -50));
+        game.addObstacle(new Obstacle("images/tree.png", 10, 7, 0, -50));
+        game.addObstacle(new Obstacle("images/tree.png", 4, 9, 0, -50));
+
+
+        //characters
+        game.addCharacter(characterGenerator.generateThief(0, "Arik", 5, 1));
+        game.addCharacter(characterGenerator.generateWarrior(1, "Thair", 5, 2));
+        game.addCharacter(characterGenerator.generateCleric(0, "Karl", 8, 3));
+        game.addCharacter(characterGenerator.generateMage(1, "Zoo", 1, 1));
+        game.addCharacter(characterGenerator.generateRanger(0, "LongShot", 8, 5));
+        game.addCharacter(characterGenerator.generateDwarf(1, "Tholi", 10, 2));
+}
+
 
 
 
 $(document).ready(function() {
     console.log( "ready!" );
-    document.oncontextmenu = function() {return false;};
     game.setup();
 
     $("#board").click(function(e) {
         game.boardClick(e);
     });
-
-    $("#board").mousedown(function(e) {
-        if( e.button == 2 ) {
-            game.boardRightClick(e);
-            return false;
-        }
-        return true;
-    });
-
-
 
     $( "#actions" ).on( "click", ".action", function() {
         game.selectAction($(this));
@@ -667,4 +711,8 @@ $(document).ready(function() {
     $("#zoomOut").click(function(e) {
         gui.zoom(-100);
     });
+
+
+    createGame();
+    game.start();
 });

@@ -83,5 +83,39 @@ img.grayscale {
     background-color: black;
     border: 2px solid #CC6600;
     width: 600px;
-    height: 400px;
+    height: 300px;
+}
+
+.lightbox .title {
+    width: 100%;
+    text-align: center;
+    margin: 50px 0 30px 0;
+    font-size: 32px;
+    color: #CC6600;
+}
+
+#atack-info .result {
+    width: 100%;
+    text-align: center;
+    margin: 30px 0 30px 0;
+    font-size: 28px;
+    color: #FF0000;
+}
+
+#atack-info .atacker,  #atack-info .weapon{
+    margin-left: 100px;
+}
+
+#atack-info .defender{
+    margin-left: 100px;
+    -moz-transform: scaleX(-1);
+    -o-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+    filter: FlipH;
+    -ms-filter: "FlipH";
+}
+
+#info {
+    height: 150px;
 }
