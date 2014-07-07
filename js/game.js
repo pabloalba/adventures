@@ -302,6 +302,13 @@ var gui = {
 
     log:function(txt){
         $("#log").append("<div>"+txt+"</div>");
+    },
+
+    showAtackLightbox: function(title){
+        $('#atack-info').find(".title").html(title);
+        $('#atack-info').lightbox_me({
+            centered: true
+        });
     }
 
 
@@ -412,6 +419,8 @@ var game = {
 
             gui.log(this.currentAction.name + " from " + this.currentCharacter.name + " to " + character.name + " deals " + damage + " damage");
 
+            gui.showAtackLightbox(this.currentAction.name + " from " + this.currentCharacter.name + " to " + character.name + " deals " + damage + " damage");
+
 
             character.life -=  damage;
 
@@ -428,6 +437,7 @@ var game = {
             }
         } else {
             gui.log(this.currentAction.name + " from " + this.currentCharacter.name + " to " + character.name + " miss");
+            gui.showAtackLightbox(this.currentAction.name + " from " + this.currentCharacter.name + " to " + character.name + " miss");
         }
         this.currentAction.coolDown = this.currentAction.maxCoolDown;
         this.currentCharacter.numActions = 0;

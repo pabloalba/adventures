@@ -78,7 +78,8 @@ img.grayscale {
     top: -9px;
 }
 
-#lightbox {
+.lightbox {
+    display: none;
     background-color: black;
     border: 2px solid #CC6600;
     width: 600px;
