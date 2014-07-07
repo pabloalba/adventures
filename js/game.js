@@ -98,6 +98,7 @@ var gui = {
     base: 72,
     scale: 1,
     setup: function() {
+        this.currentPlayer = 0;
         var canvas = $("#board");
         var width = game.sizeX * this.base+50;
         var height = game.sizeY * this.base;
@@ -313,7 +314,7 @@ var gui = {
     },
 
     startTurn: function (player) {
-        gui.log("=== START PLAYER " + this.currentPlayer + " TURN ===");
+        gui.log("===== START PLAYER " + game.currentPlayer + " TURN =====");
         $("#turn").html("Player " + player + " turn");
     },
 
