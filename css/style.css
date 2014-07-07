@@ -77,3 +77,10 @@ img.grayscale {
     left: -17px;
     top: -9px;
 }
+
+#lightbox {
+    background-color: black;
+    border: 2px solid #CC6600;
+    width: 600px;
+    height: 400px;
+}
