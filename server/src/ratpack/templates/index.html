@@ -1,0 +1,94 @@
+<html>
+  <head>
+    <title>Adventures</title>
+    <link rel="stylesheet" type="text/css" href="css/manager.css" />
+    <link href='http://fonts.googleapis.com/css?family=MedievalSharp' rel='stylesheet' type='text/css'>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/manager.js"></script>
+    <!-- http://buckwilson.me/lightboxme/ -->
+    <script src="js/jquery.lightbox_me.js"></script>
+  </head>
+  <body id="body">
+      <div class="title">Adventures of Wesnoth</div>
+
+      <div class="gameManager">
+          <form class="dataForm">
+              <div class="block">
+                  <input type="text"  name="playerName" placeholder="Player Name" maxlength="10" required="required"/>
+              </div>
+              <div class="block">
+                  <p>CHOOSE YOUR TEAM OF 4</p>
+
+                  <p>
+                      <input type="text"  name="character1Name" placeholder="Character Name" maxlength="10" required="required" />
+                      <select name="character1Type">
+                          <option>Cleric</option>
+                          <option>Dwarf</option>
+                          <option>Mage</option>
+                          <option>Ranger</option>
+                          <option>Thief</option>
+                          <option>Warrior</option>
+                      </select>
+
+                  </p>
+
+                  <p>
+                      <input type="text"  name="character2Name" placeholder="Character Name" maxlength="10" required="required"/>
+                      <select name="character2Type">
+                          <option>Cleric</option>
+                          <option>Dwarf</option>
+                          <option>Mage</option>
+                          <option>Ranger</option>
+                          <option>Thief</option>
+                          <option>Warrior</option>
+                      </select>
+
+                  </p>
+
+                  <p>
+                      <input type="text"  name="character3Name" placeholder="Character Name" maxlength="10" required="required"/>
+                      <select name="character3Type">
+                          <option>Cleric</option>
+                          <option>Dwarf</option>
+                          <option>Mage</option>
+                          <option>Ranger</option>
+                          <option>Thief</option>
+                          <option>Warrior</option>
+                      </select>
+
+                  </p>
+
+                  <p>
+                      <input type="text"  name="character4Name" placeholder="Character Name" maxlength="10" required="required"/>
+                      <select name="character4Type">
+                          <option>Cleric</option>
+                          <option>Dwarf</option>
+                          <option>Mage</option>
+                          <option>Ranger</option>
+                          <option>Thief</option>
+                          <option>Warrior</option>
+                      </select>
+
+                  </p>
+              </div>
+              <div class="block">
+                  <p>CREATE YOUR OWN GAME</p>
+                  <p><input class="gameName" type="text" name="gameName" placeholder="Game Name" maxlength="10" /><br/></p>
+                  <p><input class="createButton" type="button" value="Create" /></p>
+              </div>
+              <div class="block">
+                  <p>JOIN A GAME</p>
+                  <% model.games.each { game -> %>
+                  <p><input class="joinButton" type="button" value="$game.value.name ($game.value.player1Name)" data-gameid="$game.value.gameId" /></p>
+                  <% } %>
+              </div>
+              <input type="submit" class="hide" id="submitButton">
+            </form>
+        </div>
+        <div class="gameWait hide">
+            <div class="block">
+                Waiting for oponent...
+            </div>
+        </div>
+  </body>
+</html>

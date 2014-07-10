@@ -1,0 +1,25 @@
+body {
+    background-color: #000000;
+    color: #FFFFFF;
+    font-family: 'MedievalSharp', cursive;
+}
+
+.block {
+    width: 500px;
+    text-align: center;
+    border: 1px solid #CC6600;
+    margin: 10 auto;
+    padding: 10px 50px;
+}
+
+.title {
+    width: 100%;
+    text-align: center;
+    margin: 50px 0 30px 0;
+    font-size: 48px;
+    color: #CC6600;
+}
+
+.hide{
+    display: none;
+}

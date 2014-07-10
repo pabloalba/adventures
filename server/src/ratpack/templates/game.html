@@ -1,27 +1,38 @@
 <html>
   <head>
     <title>Adventures</title>
-    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
     <link href='http://fonts.googleapis.com/css?family=MedievalSharp' rel='stylesheet' type='text/css'>
-    <script src="js/jquery.min.js"></script>
+    <script src="/js/jquery.min.js"></script>
     <!-- http://buckwilson.me/lightboxme/ -->
-    <script src="js/jquery.lightbox_me.js"></script>
-    <script src="js/game.js"></script>
+    <script src="/js/jquery.lightbox_me.js"></script>
+    <script src="/js/game.js"></script>
+    <script src="/js/gui.js"></script>
+    <script src="/js/charactergenerator.js"></script>
+    <script src="/js/communications.js"></script>
   </head>
   <body id="body">
+      <input type="hidden" id="gameId" value="$model.gameId" />
+      <input type="hidden" id="playerId" value="$model.playerId" />
       <div class="container">
           <div class="actions-container">
               <div class="right">
-                  <img id="zoomIn" src="images/zoom_in.png"/>
-                  <img id="zoomOut" src="images/zoom_out.png"/>
+                  <img id="zoomIn" src="/images/zoom_in.png"/>
+                  <img id="zoomOut" src="/images/zoom_out.png"/>
               </div>
               <div>
+                  <div id="gameInfo" class="gameInfo">
+                      &nbsp;
+                  </div>
+                  <div id="turn" class="turn">
+                    &nbsp;
+                  </div>
                   <div class="inline">
-                    <img id="actionEndTurn" src="images/endturn.png" title="End turn"/>
+                    <img id="actionEndTurn" class="button" src="/images/endturn.png" title="End turn"/>
+                    <img id="actionPrevious" class="button" src="/images/previous.png" title="Previous character"/>
+                    <img id="actionNext" class="button" src="/images/next.png" title="Next character"/>
                   </div>
-                  <div class="inline" id="turn">
-                    Player 0 turn
-                  </div>
+
               </div>
               <div>
                   <div>
@@ -46,7 +57,7 @@
       </div>
 
       <div id="atack-info" class="lightbox">
-
+          <div class="title"></div>
           <div>
               <img class="atacker" />
               <img class="weapon" />
@@ -56,7 +67,7 @@
 
       </div>
 
-       <div id="info" class="lightbox">
+       <div id="info" class="lightbox info">
            <div class="title"></div>
        </div>
 
