@@ -63,7 +63,7 @@ var characterGenerator = {
 
     generateThief: function(id, belongsTo, name, x, y) {
         var actions = [
-            new Action(0, "MOVE", "Walk", "/images/walk.png", 5, null, 100, 0),
+            new Action(0, "MOVE", "Walk", "/images/walk.png", 5, null, null, 100, 0),
             new Action(1, "ATACK", "Dagger", "/images/dagger.png", 1, 1, 4, 80, 0),
             new Action(2, "ATACK", "Throw dagger", "/images/dagger_throw.png", 3, 1, 4, 70, 0),
             new Action(3, "ATACK", "Throw poisoned dagger", "/images/dagger_throw_poison.png", 3, 2, 12, 70, 2)
@@ -73,7 +73,7 @@ var characterGenerator = {
     },
     generateWarrior: function(id, belongsTo, name, x, y) {
         var actions = [
-            new Action(0, "MOVE", "Walk", "/images/walk.png", 4, null, 100, 0),
+            new Action(0, "MOVE", "Walk", "/images/walk.png", 4, null, null, 100, 0),
             new Action(1, "ATACK", "Sword", "/images/sword.png", 1, 1, 8, 95, 0),
             new Action(2, "ATACK", "Morningstar", "/images/mace-and-chain.png", 2, 1, 6, 80, 0)
         ];
@@ -81,7 +81,7 @@ var characterGenerator = {
     },
     generateDwarf: function(id, belongsTo, name, x, y) {
         var actions = [
-            new Action(0, "MOVE", "Walk", "/images/walk.png", 3, null, 100, 0),
+            new Action(0, "MOVE", "Walk", "/images/walk.png", 3, null, null, 100, 0),
             new Action(1, "ATACK", "Battle Axe", "/images/battleaxe.png", 1, 1, 10, 95, 0),
             new Action(2, "ATACK", "Throw rock", "/images/rock_thrown.png", 3, 1, 4, 85, 0)
         ];
@@ -89,7 +89,7 @@ var characterGenerator = {
     },
     generateCleric: function(id, belongsTo, name, x, y) {
         var actions = [
-            new Action(0, "MOVE", "Walk", "/images/walk.png", 5, null, 100, 0),
+            new Action(0, "MOVE", "Walk", "/images/walk.png", 5, null, null, 100, 0),
             new Action(1, "ATACK", "Quarterstaf", "/images/quarterstaff.png", 1, 1, 6, 95, 0),
             new Action(2, "ATACK", "Sling", "/images/sling.png", 4, 1, 4, 80, 0),
             new Action(3, "ATACK", "Fire rain", "/images/fire-rain.png", 1000, 2, 16, 1000, 4),
@@ -98,8 +98,8 @@ var characterGenerator = {
     },
     generateMage: function(id, belongsTo, name, x, y) {
         var actions = [
-            new Action(0, "MOVE", "Walk", "/images/walk.png", 5, null, 100, 0),
-            new Action(1, "FLY", "Fly", "/images/fly.png", 1000, null, 100, 2),
+            new Action(0, "MOVE", "Walk", "/images/walk.png", 5, null, null, 100, 0),
+            new Action(1, "FLY", "Fly", "/images/fly.png", 1000, null, null, 100, 2),
             new Action(2, "ATACK", "Dagger", "/images/dagger.png", 1, 1, 4, 80, 0),
             new Action(3, "ATACK", "Lighting bolt", "/images/lightning.png", 10, 3, 18, 1000, 3),
         ];
@@ -107,7 +107,7 @@ var characterGenerator = {
     },
     generateRanger: function(id, belongsTo, name, x, y) {
         var actions = [
-            new Action(0, "MOVE", "Walk", "/images/walk.png", 6, null, 100, 0),
+            new Action(0, "MOVE", "Walk", "/images/walk.png", 6, null, null, 100, 0),
             new Action(1, "ATACK", "Short sword", "/images/sword-short.png", 1, 1, 6, 90, 0),
             new Action(2, "ATACK", "Bow", "/images/bow.png", 8, 1, 8, 80, 0),
         ];
