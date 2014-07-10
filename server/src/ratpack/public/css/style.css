@@ -97,6 +97,10 @@ img.grayscale {
     right: 4px;
 }
 
+.hide {
+    display: none;
+}
+
 .lightbox {
     display: none;
     background-color: black;
@@ -175,4 +179,37 @@ img.grayscale {
     zoom: 1;
     filter: alpha(opacity=50);
     opacity: 0.5;
+}
+
+.teams {
+    position: absolute;
+    bottom: 0;
+    width: 255px;
+    padding-left: 5px;
+}
+.team {
+    margin: 5px 5px 10px 0;
+    border: 1px solid lightgray;
+}
+
+.memberContainer{
+    width: 55px;
+    display: inline-block;
+}
+
+.teamMember{
+    width: 55px;
+    height: 55px;
+}
+.teamMemberData {
+    display: inline-block;
+    text-align: center;
+    width: 55px;
+    font-size: 10px;
+    position: relative;
+    top: -9px;
+}
+
+.teamMemberSelected {
+    background-color: #333333;
 }

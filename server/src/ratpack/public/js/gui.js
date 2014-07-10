@@ -76,6 +76,47 @@ var gui = {
         }
     },
 
+
+    drawTeams: function() {
+        $(".team0").html("");
+        $(".team1").html("");
+
+        for (i=0; i<game.characters.length; i++) {
+            var character = game.characters[i];
+            var team = $(".team"+character.belongsTo);
+
+            var member = $("<div />");
+            member.addClass("memberContainer");
+            if (character == game.currentCharacter) {
+                $(member).addClass("teamMemberSelected");
+            }
+
+            var image = new Image();
+            image.src = character.src;
+            $(image).data("num", i);
+            $(image).addClass("teamMember");
+            if (character.numActions <=0) {
+                $(image).addClass("grayscale");
+            }
+
+
+            member.append(image);
+
+
+
+            var data = $("<div />");
+            data.addClass("teamMemberData");
+            data.html(character.life+" / "+character.maxLife);
+
+            member.append(data);
+
+
+
+
+            team.append(member);
+        }
+    },
+
     drawObstacles: function() {
         for (i=0; i<game.obstacles.length; i++) {
             var obstacle = game.obstacles[i];
@@ -206,6 +247,7 @@ var gui = {
         this.drawObstacles();
         this.drawProbabilities();
         this.drawCurrentCharacter();
+        this.drawTeams();
     },
 
     clickPosition: function(e) {

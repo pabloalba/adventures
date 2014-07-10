@@ -96,7 +96,13 @@ var game = {
     },
 
     atack: function(character, prob, dam, isRemote){
-        var probability = prob || game.probability(character);
+        var probability;
+        if (prob) {
+            probability = prob;
+        } else {
+            var probability = game.probability(character);
+        }
+
         var damage = 0;
         if ((Math.random() * 100) < probability) {
             damage = dam || Math.floor((Math.random() * (game.currentAction.maxDamage - game.currentAction.minDamage + 1)) + game.currentAction.minDamage);
@@ -141,6 +147,10 @@ var game = {
         game.clearAction();
         game.currentCharacter = character;
         game.selectFirstAction();
+    },
+
+    selectCharacterByNum: function(num){
+        game.selectCharacter(game.characters[num]);
     },
 
     drawPath: function() {
@@ -300,7 +310,11 @@ var game = {
     },
 
     probability: function(character) {
-        return game.currentAction.success - character.armor;
+        var prob = game.currentAction.success - character.armor;
+        if (prob < 0) {
+            prob = 1;
+        }
+        return prob;
     },
 
     onDistance: function(charX, charY, range) {
@@ -567,6 +581,12 @@ $(document).ready(function() {
     $("#actionNext").click(function(e) {
         if (game.canClick()) {
             game.selectNextCharacter();
+        }
+    });
+
+    $( "body" ).on( "click", ".teamMember", function() {
+        if (game.canClick()) {
+            game.selectCharacterByNum($(this).data("num"));
         }
     });
 
