@@ -6,6 +6,12 @@ var gui = {
 
         $("#gameInfo").append(game.name);
 
+        $(".teams .player0").html(game.playerName[0]+"'s team");
+        $(".teams .player1").html(game.playerName[1]+"'s team");
+
+
+
+
         this.currentPlayer = 0;
         var canvas = $("#board");
         var width = game.sizeX * this.base;

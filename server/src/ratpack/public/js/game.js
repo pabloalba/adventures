@@ -498,6 +498,10 @@ function createGame() {
                 game.sizeX = data.sizeX;
                 game.sizeY = data.sizeY;
                 game.name = data.name;
+                game.isOwner = data.isOwner;
+                game.playerName = []
+                game.playerName[0] = data.player1Name;
+                game.playerName[1] = data.player2Name;
 
                 game.setup();
                 var numCharacter = 0;
@@ -529,10 +533,6 @@ function createGame() {
                 }
 
 
-                game.isOwner = data.isOwner;
-                game.playerName = []
-                game.playerName[0] = data.player1Name;
-                game.playerName[1] = data.player2Name;
                 gui.startTurn(game.playerName[0]);
                 game.selectFirstCharacter();
 
