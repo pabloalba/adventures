@@ -301,6 +301,8 @@ var gui = {
         gui.lightboxElement = element;
 
         gui.lightboxElement.show();
+
+        setTimeout(gui.closeLightbox, 5000);
     },
 
     closeLightbox: function(element) {
