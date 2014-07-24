@@ -28,6 +28,8 @@ canvas {
     height: 100%;
     display: inline-block;
     border: 1px solid #CC6600;
+    position: relative;
+    min-height: 650px;
 }
 .board-container {
     float: left;
